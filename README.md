@@ -5,7 +5,12 @@ Leyaa George <leyaageo@usc.edu>
 
 Rida Faraz <faraz@usc.edu>
 
-## Instructions on Use
+## Setup Instructions
+
+First set up node 2, the processor.
+
+To install dependencies, run: 
+'''pip install -r requirements.txt'''
 
 ## External Libraries
 Next.js (The Next.js framework helped us create our user interface.)
