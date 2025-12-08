@@ -10,6 +10,12 @@ from audio_processor import AudioFeatureExtractor
 from ml_inference import SoundClassifier
 from database import DatabaseManager
 from notifications import NotificationManager
+import os
+from pathlib import Path
+
+# At the top of main.py, add:
+AUDIO_SAVE_DIR = Path("./audio_clips")
+AUDIO_SAVE_DIR.mkdir(exist_ok=True)
 
 # Setup
 logging.basicConfig(level='INFO')
@@ -42,7 +48,14 @@ async def classify_sound(
         # Read uploaded audio
         audio_bytes = await audio.read()
         
-        # Parse WAV file
+        # Save to disk for debugging
+        filename = f"audio_clip_{timestamp.replace(':', '-').replace('.', '_')}.wav"
+        filepath = AUDIO_SAVE_DIR / filename
+        with open(filepath, 'wb') as f:
+            f.write(audio_bytes)
+        logger.info(f"Saved audio to: {filepath}")
+        
+        # Parse WAV file to get raw audio samples
         audio_data = parse_wav_data(audio_bytes)
         if audio_data is None:
             return JSONResponse(
@@ -50,11 +63,13 @@ async def classify_sound(
                 status_code=400
             )
         
-        # Extract MFCC features
-        features = AudioFeatureExtractor.extract_mfcc_features(audio_data)
+        logger.info(f"Raw audio shape: {audio_data.shape}")
         
-        # Run inference
-        prediction = classifier.predict(features)
+        # DON'T extract MFCC - use raw audio for YAMNet
+        # YAMNet works best with the full waveform
+        
+        # Run inference on raw audio
+        prediction = classifier.predict(audio_data)
         
         # Store in database
         db_result = db.insert_event(
@@ -62,7 +77,7 @@ async def classify_sound(
             sound_class=prediction['class'],
             confidence=prediction['confidence'],
             decibel_level=decibel_level,
-            audio_path=None,  # Could store the file if needed
+            audio_path=str(filepath),
             probabilities=prediction['probabilities'],
             session_id=session_id
         )
