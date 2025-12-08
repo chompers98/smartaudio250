@@ -1,6 +1,6 @@
 # EE250 Final Project: IoT Device for Smart Home Audio Detection
 
-## Description
+## Description of Device
 Clear description of what your IoT system is trying to achieve
 
 ## Block Diagram
