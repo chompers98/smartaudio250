@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 import logging
 import time
 import uuid
+import socket
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -31,6 +32,15 @@ class AudioRecorder:
         self.dynamic_threshold = 60  # Default fallback
         Path("./audio_clips").mkdir(exist_ok=True)
         logger.info("AudioRecorder initialized")
+        
+    def test_connection(self):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        result = sock.connect_ex(('192.0.0.2', 8000))
+        if result == 0:
+            print("✓ Port is open")
+        else:
+            print(f"✗ Port is closed or unreachable. Error code: {result}")
+        sock.close()
     
     def record_chunk(self, duration=0.03):
         """Record a chunk of audio"""
@@ -199,4 +209,5 @@ class AudioRecorder:
 
 if __name__ == '__main__':
     recorder = AudioRecorder()
-    recorder.run()
+    recorder.test_connection()
+    #recorder.run()

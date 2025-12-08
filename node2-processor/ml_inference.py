@@ -7,48 +7,48 @@ import tensorflow_hub as hub
 logger = logging.getLogger(__name__)
 
 # Our custom trained random forest classifier
-class SoundClassifier:
-    """
-    Sound classifier using a trained Random Forest model.
-    """
-    
-    def __init__(self, rf_model_path="random_forest_audio_classifier.pkl", label_encoder_path="label_encoder.pkl"):
-        self.sample_rate = 16000
-        
-        logger.info("Loading Random Forest model...")
-        self.model = joblib.load(rf_model_path)
-        self.le = joblib.load(label_encoder_path)
-        logger.info("✓ Random Forest model loaded successfully.")
-
-    def _extract_mfcc(self, audio_data):
-        mfcc = librosa.feature.mfcc(y=audio_data, sr=self.sample_rate, n_mfcc=13)
-        return np.mean(mfcc.T, axis=0).reshape(1, -1)
-
-    def predict(self, audio_data):
-        if audio_data.dtype != np.float32:
-            audio_data = audio_data.astype(np.float32)
-
-        max_val = np.max(np.abs(audio_data))
-        if max_val > 0:
-            audio_data = audio_data / max_val
-
-        try:
-            mfcc_features = self._extract_mfcc(audio_data)
-            prediction = self.model.predict(mfcc_features)[0]
-            label = self.le.inverse_transform([prediction])[0]
-            probs = self.model.predict_proba(mfcc_features)[0]
-            prob_dict = dict(zip(self.le.classes_, probs))
-            return {
-                "class": label,
-                "confidence": float(probs[prediction]),
-                "probabilities": prob_dict
-            }
-        except Exception as e:
-            logger.error(f"Random Forest prediction failed: {e}")
-            return {"class": "unknown", "confidence": 0.0, "probabilities": {}}
+#class SoundClassifier:
+#    """
+#    Sound classifier using a trained Random Forest model.
+#    """
+#    
+#    def __init__(self, rf_model_path="random_forest_audio_classifier.pkl", label_encoder_path="label_encoder.pkl"):
+#        self.sample_rate = 16000
+#        
+#        logger.info("Loading Random Forest model...")
+#        self.model = joblib.load(rf_model_path)
+#        self.le = joblib.load(label_encoder_path)
+#        logger.info("✓ Random Forest model loaded successfully.")
+#
+#    def _extract_mfcc(self, audio_data):
+#        mfcc = librosa.feature.mfcc(y=audio_data, sr=self.sample_rate, n_mfcc=13)
+#        return np.mean(mfcc.T, axis=0).reshape(1, -1)
+#
+#    def predict(self, audio_data):
+#        if audio_data.dtype != np.float32:
+#            audio_data = audio_data.astype(np.float32)
+#
+#        max_val = np.max(np.abs(audio_data))
+#        if max_val > 0:
+#            audio_data = audio_data / max_val
+#
+#        try:
+#            mfcc_features = self._extract_mfcc(audio_data)
+#            prediction = self.model.predict(mfcc_features)[0]
+#            label = self.le.inverse_transform([prediction])[0]
+#            probs = self.model.predict_proba(mfcc_features)[0]
+#            prob_dict = dict(zip(self.le.classes_, probs))
+#            return {
+#                "class": label,
+#                "confidence": float(probs[prediction]),
+#                "probabilities": prob_dict
+#            }
+#        except Exception as e:
+#            logger.error(f"Random Forest prediction failed: {e}")
+#            return {"class": "unknown", "confidence": 0.0, "probabilities": {}}
 
 # Google's YAMNet model for audio classification
-class YAMNetClassifier:
+class SoundClassifier:
     """
     Use Google's YAMNet pre-trained audio classification model.
     Recognizes 521 sound classes including household sounds.
