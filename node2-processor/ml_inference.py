@@ -1,13 +1,18 @@
-import pickle
+import joblib
+import librosa
 import numpy as np
 import logging
 
 logger = logging.getLogger(__name__)
 
+# Config to match training
+SAMPLE_RATE = 16000
+N_MFCC = 13
+
 class SoundClassifier:
     """
     Load and run inference with scikit-learn Random Forest model.
-    Uses your partner's trained Random Forest classifier.
+    Uses joblib to load the model (NOT pickle).
     """
     
     def __init__(self, model_path='models/random_forest_audio_classifier.pkl',
@@ -22,13 +27,9 @@ class SoundClassifier:
         try:
             logger.info(f"Loading Random Forest model from: {model_path}")
             
-            # Load the trained Random Forest model
-            with open(model_path, 'rb') as f:
-                self.model = pickle.load(f)
-            
-            # Load the label encoder
-            with open(encoder_path, 'rb') as f:
-                self.label_encoder = pickle.load(f)
+            # Load using joblib (NOT pickle!)
+            self.model = joblib.load(model_path)
+            self.label_encoder = joblib.load(encoder_path)
             
             self.classes = self.label_encoder.classes_
             
@@ -39,25 +40,55 @@ class SoundClassifier:
             logger.error(f"Failed to load model: {e}")
             raise
     
+    def extract_features_from_audio(self, audio_data):
+        """
+        Extract MFCC features from raw audio data.
+        Must match the training feature extraction!
+        
+        Args:
+            audio_data: numpy array of audio samples (16kHz, mono)
+        
+        Returns:
+            numpy array of shape (N_MFCC,)
+        """
+        try:
+            # Convert to float if needed
+            if audio_data.dtype != np.float32 and audio_data.dtype != np.float64:
+                audio_data = audio_data.astype(np.float32) / 32768.0
+            
+            # Extract MFCC (same as training)
+            mfcc = librosa.feature.mfcc(y=audio_data, sr=SAMPLE_RATE, n_mfcc=N_MFCC)
+            
+            # Average across time (same as training)
+            features = np.mean(mfcc.T, axis=0)
+            
+            logger.info(f"Extracted features shape: {features.shape}")
+            return features
+        
+        except Exception as e:
+            logger.error(f"Error extracting features: {e}")
+            raise
+    
     def predict(self, features):
         """
-        Run inference on MFCC feature vector.
+        Run inference on feature vector.
         
         Args:
             features: numpy array of MFCC features
-                     Shape can be (num_frames, num_mfcc) or (num_mfcc,)
+                     Can be raw audio OR pre-extracted MFCC features
         
         Returns:
             dict with keys: 'class', 'confidence', 'probabilities'
         """
         try:
-            # Handle different input shapes
+            # If features look like raw audio (long array), extract MFCC
+            if features.shape[0] > 100:
+                logger.info(f"Treating input as raw audio, extracting MFCC...")
+                features = self.extract_features_from_audio(features)
+            
+            # Reshape for sklearn
             if features.ndim == 1:
-                # Single frame - reshape to (1, num_features)
                 features = features.reshape(1, -1)
-            elif features.ndim == 2:
-                # Multiple frames - take mean across time
-                features = np.mean(features, axis=0).reshape(1, -1)
             
             logger.info(f"Input features shape: {features.shape}")
             
@@ -65,17 +96,31 @@ class SoundClassifier:
             pred_class_idx = self.model.predict(features)[0]
             pred_class = self.label_encoder.inverse_transform([pred_class_idx])[0]
             
-            # Get probabilities (if Random Forest supports predict_proba)
-            if hasattr(self.model, 'predict_proba'):
-                probabilities = self.model.predict_proba(features)[0]
-                prob_dict = {
-                    cls: float(prob)
-                    for cls, prob in zip(self.classes, probabilities)
-                }
-                confidence = float(probabilities[pred_class_idx])
-            else:
-                # Fallback if no predict_proba
-                prob_dict = {cls: 0.0 for cl
+            # Get probabilities
+            probabilities = self.model.predict_proba(features)[0]
+            prob_dict = {
+                cls: float(prob)
+                for cls, prob in zip(self.classes, probabilities)
+            }
+            confidence = float(probabilities[pred_class_idx])
+            
+            logger.info(f"Prediction: {pred_class} ({confidence:.2%})")
+            logger.info(f"Probabilities: {prob_dict}")
+            
+            return {
+                'class': pred_class,
+                'confidence': confidence,
+                'probabilities': prob_dict
+            }
+        
+        except Exception as e:
+            logger.error(f"Error in prediction: {e}", exc_info=True)
+            # Fallback response
+            return {
+                'class': 'silence',
+                'confidence': 0.5,
+                'probabilities': {cls: 1.0/len(self.classes) for cls in self.classes}
+            }
 
 #import numpy as np
 #import logging
