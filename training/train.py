@@ -57,3 +57,9 @@ y_pred = clf.predict(X_test)
 print(f"\n✅ Accuracy: {accuracy_score(y_test, y_pred) * 100:.2f}%\n")
 print("Classification Report:")
 print(classification_report(y_test, y_pred, target_names=le.classes_))
+
+# === Save Model ===
+import joblib
+joblib.dump(clf, "../node2-processor/models/random_forest_audio_classifier.pkl")
+joblib.dump(le, "../node2-processor/models/label_encoder.pkl")  
+
