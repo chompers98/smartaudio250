@@ -57,6 +57,7 @@ Start recording:
 
 ## External Libraries
 [Data Set](https://drive.google.com/drive/folders/1xA27s1DDCEcmnuguD2fvUZmhmx-bB55C?usp=sharing) (We created a custom data set to train our model. It can be accessed using the Google Drive folder)
+
 Next.js (The Next.js framework helped us create our user interface.)
 
 # Additional Information
