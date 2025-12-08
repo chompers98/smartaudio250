@@ -40,7 +40,7 @@ Finally, start the server:
 Next, set up node 1 to allow us to capture audio data and send it to node 2.
 
 Chnage directories into node 1's subfolder:
-```cd node2-processor```
+```cd node1-recoder```
 
 Install requires dependencies by running in command line:
 ```pip install -r requirements.txt```
