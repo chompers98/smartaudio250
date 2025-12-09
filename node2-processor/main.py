@@ -69,7 +69,6 @@ async def classify_sound(
             sound_class=prediction['class'],
             confidence=prediction['confidence'],
             decibel_level=decibel_level,
-            audio_path=str(filepath),
             probabilities=prediction['probabilities'],
             session_id=session_id
         )
