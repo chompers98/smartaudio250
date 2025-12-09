@@ -63,7 +63,7 @@ EOF
 View activity log by opening `http://localhost:8000` in node 2 device's browser. 
 
 ## External Libraries
-* `[Data Set](https://drive.google.com/drive/folders/1xA27s1DDCEcmnuguD2fvUZmhmx-bB55C?usp=sharing)` (We created a custom data set to train our model. It can be accessed using the Google Drive folder.)
+* [Data Set](https://drive.google.com/drive/folders/1xA27s1DDCEcmnuguD2fvUZmhmx-bB55C?usp=sharing) (We created a custom data set to train our model. It can be accessed using the Google Drive folder.)
 * `FastAPI` (FastAPI was used to constantly listen for data sent to node 2 and run the processing scripts. This allowed us to facilitate HTTP communication.)
 * `librosa` (This library provided many features that allowed us to process the audio data, including altering its sampling size, file extension, duration, etc.)
 * `scikit-learn` (This library was used to implement the random classifier model that was trained using the custom data set.)
