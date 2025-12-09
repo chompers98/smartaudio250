@@ -11,8 +11,8 @@ from database import DatabaseManager
 import os
 from pathlib import Path
 
-#AUDIO_SAVE_DIR = Path("./audio_clips")
-#AUDIO_SAVE_DIR.mkdir(exist_ok=True)
+AUDIO_SAVE_DIR = Path("./audio_clips")
+AUDIO_SAVE_DIR.mkdir(exist_ok=True)
 
 logging.basicConfig(level='INFO')
 logger = logging.getLogger(__name__)
@@ -43,12 +43,12 @@ async def classify_sound(
         # eead uploaded audio
         audio_bytes = await audio.read()
         
-#        # DEBUGGING: save wav to disk
-#        filename = f"audio_clip_{timestamp.replace(':', '-').replace('.', '_')}.wav"
-#        filepath = AUDIO_SAVE_DIR / filename
-#        with open(filepath, 'wb') as f:
-#            f.write(audio_bytes)
-#        logger.info(f"Saved audio to: {filepath}")
+        # DEBUGGING: save wav to disk
+        filename = f"audio_clip_{timestamp.replace(':', '-').replace('.', '_')}.wav"
+        filepath = AUDIO_SAVE_DIR / filename
+    #        with open(filepath, 'wb') as f:
+    #            f.write(audio_bytes)
+    #        logger.info(f"Saved audio to: {filepath}")
         
         # parse WAV file to get raw audio samples
         audio_data = parse_wav_data(audio_bytes)
@@ -69,6 +69,7 @@ async def classify_sound(
             sound_class=prediction['class'],
             confidence=prediction['confidence'],
             decibel_level=decibel_level,
+            audio_path=str(filepath),
             probabilities=prediction['probabilities'],
             session_id=session_id
         )
@@ -81,7 +82,7 @@ async def classify_sound(
             "timestamp": timestamp,
             "event_id": db_result
         }
-    
+
     except Exception as e:
         logger.error(f"Error in classification: {e}", exc_info=True)
         return JSONResponse(
