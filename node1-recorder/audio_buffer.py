@@ -1,59 +1,41 @@
+# Create a rolling buffer to track audio snippet before event was detected
 import numpy as np
 from collections import deque
 from threading import Lock
 
+# Maintain a rolling buffer, includes data before threshold is triggered to ensure data isn't lost
 class RollingAudioBuffer:
-    """
-    Maintains a rolling buffer of audio frames for pre-capture.
-    When threshold is triggered, we can include data from before the event.
-    """
     def __init__(self, max_frames):
         self.buffer = deque(maxlen=max_frames)
         self.lock = Lock()
     
+    # Add an audio frame
     def add_frame(self, frame):
-        """Add a single audio frame (numpy array)"""
         with self.lock:
             self.buffer.append(frame.copy())
     
+    # Retrieve frames from the buffer 
     def get_all(self):
-        """Get all buffered frames as single array"""
         with self.lock:
             if not self.buffer:
                 return np.array([])
             return np.concatenate(list(self.buffer))
 
+# Compute statistics on the audio frames to determine event trigger (RMS, dB level)
 class AudioProcessor:
-    """Compute audio statistics (RMS, dB level)"""
-    
+
     @staticmethod
+    # Calculate root mean square (RMS) of audio frame
     def calculate_rms(audio_frame):
-        """
-        Calculate RMS (root mean square) of audio frame.
-        Args:
-            audio_frame: numpy array of int16 samples
-        Returns:
-            float: RMS value
-        """
-        # Convert to float for computation
-        frame_float = audio_frame.astype(np.float32) / 32768.0
+        frame_float = audio_frame.astype(np.float32) / 32768.0 # LLM Tip: Convert to float for overflow error
         rms = np.sqrt(np.mean(frame_float ** 2))
         return rms
     
+    # Calculate the decibel level from an audio frame
     @staticmethod
     def calculate_decibel(audio_frame, reference_level=0.005):
-        """
-        Convert RMS to decibel scale.
-        Args:
-            audio_frame: numpy array of int16 samples
-            reference_level: reference RMS for dB calculation
-        Returns:
-            float: Decibel level
-        """
         rms = AudioProcessor.calculate_rms(audio_frame)
-        
         if rms == 0:
             return -np.inf
-        
-        db = 20 * np.log10(rms / reference_level)
+        db = 20 * np.log10(rms / reference_level) # Convert RMS to dB
         return db
