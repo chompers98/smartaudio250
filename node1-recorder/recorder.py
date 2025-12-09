@@ -5,29 +5,21 @@ import requests
 import json
 from datetime import datetime
 from pathlib import Path
-import os
 from dotenv import load_dotenv
 import logging
 import time
-import uuid
-import socket
+
+load_dotenv()
+from config import SAMPLE_RATE, CHUNK_SIZE, CHANNELS, CAPTURE_DURATION, NODE2_SERVER_URL
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-load_dotenv()
-SAMPLE_RATE = 16000
-CHANNELS = 1
-CHUNK_SIZE = 512
-CAPTURE_DURATION = 4
-NODE2_SERVER_URL = os.getenv('NODE2_SERVER_URL')
 
 # audio recording class
 class AudioRecorder:
     def __init__(self):
         self.sample_rate = SAMPLE_RATE
-        self.session_id = str(uuid.uuid4())
-        self.noise_floor_db = 50  
+        self.noise_floor_db = 50
         self.dynamic_threshold = 60  
         Path("./audio_clips").mkdir(exist_ok=True)
         logger.info("AudioRecorder initialized")
@@ -161,7 +153,6 @@ class AudioRecorder:
                 # check if sound exceeds dynamic threshold
                 if db > self.dynamic_threshold:
                     logger.info(f"Sound detected! dB: {db:.1f} (threshold: {self.dynamic_threshold:.1f})")
-                    print(f"\nSound detected: {db:.1f} dB")
                     
                     # record full audio clip
                     audio = self.record_audio(CAPTURE_DURATION)
