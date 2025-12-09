@@ -1,11 +1,12 @@
+# Debugging File: Created with the help of Copilot to test record and send functionality
 import sounddevice as sd
 import numpy as np
 
 SAMPLE_RATE = 16000
 CHANNELS = 1
 
-print("Recording 10 seconds of audio to diagnose noise...")
-print("(Be completely silent, turn off fans, close apps)\n")
+print("🤫 Recording 10 seconds of audio to diagnose noise...")
+print("🔇 (Be completely silent, turn off fans, close apps)\n")
 
 audio = sd.rec(int(SAMPLE_RATE * 10), samplerate=SAMPLE_RATE, channels=CHANNELS, dtype='int16', blocking=True)
 audio = audio.flatten()
@@ -23,4 +24,4 @@ for i, name in enumerate(['0-2s', '2-4s', '4-6s', '6-8s', '8-10s']):
 # Save for inspection
 import scipy.io.wavfile as wavfile
 wavfile.write('test_audio.wav', SAMPLE_RATE, audio.astype(np.int16))
-print("\nSaved to test_audio.wav")
+print("\nSaved to test_audio.wav ✅")
