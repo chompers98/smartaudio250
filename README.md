@@ -41,10 +41,10 @@ pip install -r requirements.txt
 
 3. Create a .env file (Replace localhost with the public https ngrok link if connecting to external device):
 ```
-cat > .env << EOF
-NODE2_SERVER_URL=http://localhost:8000
-EOF
+touch .env
+nano .env
 ```
+Within the .env, paste ```NODE2_SERVER_URL=http://localhost:8000``` and then save and exit.
 
 4. Start listening for sound events:
 ```python recorder.py```
