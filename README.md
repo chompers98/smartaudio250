@@ -1,9 +1,9 @@
 # EE250 Final Project: IoT Device for Smart Home Audio Detection
 
 ## Team Members
-Leyaa George <leyaageo@usc.edu>
+* Leyaa George <leyaageo@usc.edu>
 
-Rida Faraz <faraz@usc.edu>
+* Rida Faraz <faraz@usc.edu>
 
 ## Setup Instructions
 
