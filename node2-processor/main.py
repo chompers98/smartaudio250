@@ -6,27 +6,22 @@ import wave
 import logging
 from datetime import datetime
 from config import *
-from audio_processor import AudioFeatureExtractor
 from ml_inference import SoundClassifier
 from database import DatabaseManager
-from notifications import NotificationManager
 import os
 from pathlib import Path
 
-# At the top of main.py, add:
-AUDIO_SAVE_DIR = Path("./audio_clips")
-AUDIO_SAVE_DIR.mkdir(exist_ok=True)
+#AUDIO_SAVE_DIR = Path("./audio_clips")
+#AUDIO_SAVE_DIR.mkdir(exist_ok=True)
 
-# Setup
 logging.basicConfig(level='INFO')
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Sound Detection Node 2")
 
-# Load models and services
+# load models and services
 classifier = SoundClassifier()
 db = DatabaseManager()
-notifier = NotificationManager()
 
 @app.get("/health")
 async def health_check():
@@ -45,17 +40,17 @@ async def classify_sound(
     Receives audio clip from Node 1 and returns classification.
     """
     try:
-        # Read uploaded audio
+        # eead uploaded audio
         audio_bytes = await audio.read()
         
-        # Save to disk for debugging
-        filename = f"audio_clip_{timestamp.replace(':', '-').replace('.', '_')}.wav"
-        filepath = AUDIO_SAVE_DIR / filename
-        with open(filepath, 'wb') as f:
-            f.write(audio_bytes)
-        logger.info(f"Saved audio to: {filepath}")
+#        # DEBUGGING: save wav to disk
+#        filename = f"audio_clip_{timestamp.replace(':', '-').replace('.', '_')}.wav"
+#        filepath = AUDIO_SAVE_DIR / filename
+#        with open(filepath, 'wb') as f:
+#            f.write(audio_bytes)
+#        logger.info(f"Saved audio to: {filepath}")
         
-        # Parse WAV file to get raw audio samples
+        # parse WAV file to get raw audio samples
         audio_data = parse_wav_data(audio_bytes)
         if audio_data is None:
             return JSONResponse(
@@ -64,14 +59,11 @@ async def classify_sound(
             )
         
         logger.info(f"Raw audio shape: {audio_data.shape}")
-        
-        # DON'T extract MFCC - use raw audio for YAMNet
-        # YAMNet works best with the full waveform
-        
-        # Run inference on raw audio
+                
+        # run inference on raw audio
         prediction = classifier.predict(audio_data)
         
-        # Store in database
+        # store in database
         db_result = db.insert_event(
             timestamp=datetime.fromisoformat(timestamp.replace('Z', '+00:00')),
             sound_class=prediction['class'],
@@ -81,14 +73,6 @@ async def classify_sound(
             probabilities=prediction['probabilities'],
             session_id=session_id
         )
-        
-        # Send notification if high confidence
-        if prediction['confidence'] > CONFIDENCE_THRESHOLD:
-            notifier.send_sms(
-                prediction['class'],
-                prediction['confidence'],
-                decibel_level
-            )
         
         return {
             "classification": prediction['class'],
