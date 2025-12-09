@@ -23,7 +23,7 @@ pip install -r requirements.txt
 4. Finally, start the server:
 ```python main.py```
 
-** Create a public link in another terminal if you want external devices to connect to your server (ie: node 1 to be an external device), or leave it as localhost if testing on the same device. For public link:
+**Create a public link in another terminal if you want external devices to connect to your server (ie: node 1 to be an external device), or leave it as localhost if testing on the same device. For public link:**
 ```ngrok http 8000```
 
 ### Node 1: The Recorder
