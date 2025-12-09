@@ -64,3 +64,6 @@ View activity log by opening `http://localhost:8000` in node 2 device's browser.
 * `ngrok` (This library was used to transform the localhost link hosting node 2 into a public link that could be accessed by any device, enabling node to node communication.)
 * `sounddevice` (This records audio from the microphone.)
 * Full Dependency List (From `requirements.txt`): `aiohappyeyeballs, annotated-types, anyio, async-timeout, attrs, audioread, beautifulsoup4, certifi, cffi, charset-normalizer, click, contourpy, cycler, decorator, docopt, exceptiongroup, fastapi, filelock, fonttools, frozenlist, h11, idna, importlib_resources, Jinja2, joblib, Js2Py, kiwisolver, lazy_loader, librosa, llvmlite, MarkupSafe, matplotlib, mpmath, msgpack, multidict, networkx, numba, numpy, packaging, pandas, pillow, pipwin, platformdirs, pooch, propcache, psycopg2-binary, PyAudio, pycparser, pydantic, python-dateutil, python-dotenv, python-multipart, pytz, requests, scikit-learn, scipy, scikit-learn, seaborn, six, sniffio, sounddevice, soundfile, soupsieve, soxr, starlette, sympy, threadpoolctl, torch, typing_extensions, tzdata, urllib3, uv, uvicorn, yarl, zipp`
+
+## AI Logs
+AI Logs are stored in the ai_logs directory. Rida's AI Log is titled rf_log.pdf, while Leyaa's AI Log is titled lg_log.pdf
