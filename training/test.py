@@ -1,8 +1,10 @@
+# Sandbox to test intermediate steps
 import os
 import wave
 import contextlib
 from scipy.io import wavfile
 
+# Check whether .wav files were standardized correctly
 path = '../data/talking/talking1.wav'
         
 try:
@@ -13,19 +15,13 @@ try:
         nframes = f.getnframes()
         duration = nframes / float(framerate)
         
-        issues = []
         if channels != 1:
-            issues.append("not mono")
+            print("Not mono}")
         if framerate != 16000:
-            issues.append("not 16kHz")
+            print("Not 16 kHz")
         if sampwidth != 2:
-            issues.append("not 16-bit")
+            print("Not 16-bit")
         if duration < 4.5 or duration > 5.5:
-            issues.append(f"duration {duration:.2f}s")
-
-        if issues:
-            print(f"{path}: ❌ {'; '.join(issues)}")
-        else:
-            print(f"{path}: ✅ OK")
+            print("Incorrect duration")
 except Exception as e:
-    print(f"{path}: ⚠️ Error reading file - {e}")
+    print("Error reading file")
