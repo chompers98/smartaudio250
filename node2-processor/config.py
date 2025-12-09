@@ -1,7 +1,4 @@
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # audio processing variables
 SAMPLE_RATE = 16000
