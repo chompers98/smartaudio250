@@ -34,7 +34,7 @@ class AudioRecorder:
 #            print(f"Node 2 Connection Failed: {e}")
 
     # record audio in small segments
-    def record_chunk(self, duration=0.03):
+    def record_chunk(self, duration=0.05):
         samples = int(self.sample_rate * duration)
         audio = sd.rec(samples, samplerate=self.sample_rate, channels=CHANNELS, dtype='int16', blocking=True)
         return audio.flatten()
@@ -147,7 +147,7 @@ class AudioRecorder:
         try:
             while True:
                 # record short chunk and calculate dB
-                chunk = self.record_chunk(0.05)
+                chunk = self.record_chunk()
                 db = self.calculate_db(chunk)
                 
                 # check if sound exceeds dynamic threshold
