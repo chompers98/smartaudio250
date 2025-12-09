@@ -13,43 +13,33 @@ First, set up node 2, the processor, as its server needs to be running for us to
 1. Change directories into node 2's subfolder after cloning the repository:
 ```cd node2-processor```
 
-2. To install dependencies, run installation in command line: 
-```pip install -r requirements.txt```
-
-3. Then create a .env file for settings configuration:
+2. Create virtual environment and install dependencies:
 ```
-cat > .env << EOF
-NODE2_SERVER_URL=http://localhost:8000
-DB_HOST=localhost
-DB_USER=postgres
-DB_PASSWORD=password
-DB_NAME=sound_detection
-TWILIO_ACCOUNT_SID=your_sid
-TWILIO_AUTH_TOKEN=your_token
-TWILIO_PHONE_FROM=+1234567890
-NOTIFY_PHONE_TO=+1234567890
-EOF
+python3.13 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
-4. Set up the PostgreSQL Database:
-```psql -U postgres -c "CREATE DATABASE sound_detection;```
-
-5. Finally, start the server:
+4. Finally, start the server:
 ```python main.py```
 
-** Create a public link if you want external devices to connect to your server, or leave it as localhost if testing on the same device. For public link:
+** Create a public link in another terminal if you want external devices to connect to your server (ie: node 1 to be an external device), or leave it as localhost if testing on the same device. For public link:
 ```ngrok http 8000```
 
 ### Node 1: The Recorder
 Next, set up node 1 to allow us to capture audio data and send it to node 2.
 
 1. Change directories into node 1's subfolder:
-```cd node1-recoder```
+```cd node1-recorder```
 
-2. Install required dependencies by running in command line:
-```pip install -r requirements.txt```
+2. Create virtual environment and install dependencies:
+```
+python3.13 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
-3. Create a .env file (Replace localhost with the public ngrok link if connecting to external device):
+3. Create a .env file (Replace localhost with the public https ngrok link if connecting to external device):
 ```
 cat > .env << EOF
 NODE2_SERVER_URL=http://localhost:8000
@@ -64,9 +54,13 @@ View activity log by opening `http://localhost:8000` in node 2 device's browser.
 
 ## External Libraries
 * [Data Set](https://drive.google.com/drive/folders/1xA27s1DDCEcmnuguD2fvUZmhmx-bB55C?usp=sharing) (We created a custom data set to train our model. It can be accessed using the Google Drive folder.)
-* `FastAPI` (FastAPI was used to constantly listen for data sent to node 2 and run the processing scripts. This allowed us to facilitate HTTP communication.)
-* `librosa` (This library provided many features that allowed us to process the audio data, including altering its sampling size, file extension, duration, etc.)
+* `fastapi` (FastAPI to facilitate HTTP communication by defining our API endpoints.)
+* `uvicorn` (ASGI server that runs our FastAPI app and listens on the specified port.)
+* `librosa` (This library provided many features that allowed us to process the audio data, including MFCC, altering its sampling size, file extension, duration, etc.)
 * `scikit-learn` (This library was used to implement the random classifier model that was trained using the custom data set.)
 * `joblib` (This library was used to save the parameters of the random forest classifier so that it could be used by the processing node to generate inferences.)
+* `sqlite` (This library is used to create the database that stores the audio classifcations, including the timestamp of detection, confidence level, and dB level.)
+* `scipy` (This is used for WAV file saving and parsing)
 * `ngrok` (This library was used to transform the localhost link hosting node 2 into a public link that could be accessed by any device, enabling node to node communication.)
-* Full Dependency List (From `requirements.txt`): `aiohappyeyeballs, annotated-types, anyio, async-timeout, attrs, audioread, beautifulsoup4, certifi, cffi, charset-normalizer, click, contourpy, cycler, decorator, docopt, exceptiongroup, filelock, fonttools, frozenlist, h11, idna, importlib_resources, Jinja2, joblib, Js2Py, kiwisolver, lazy_loader, librosa, llvmlite, MarkupSafe, matplotlib, mpmath, msgpack, multidict, networkx, numba, numpy, packaging, pandas, pillow, pipwin, platformdirs, pooch, propcache, psycopg2-binary, PyAudio, pycparser, pydantic, python-dateutil, python-dotenv, pytz, requests, scikit-learn, scipy, seaborn, six, sniffio, soundfile, soupsieve, soxr, starlette, sympy, threadpoolctl, torch, twilio, typing_extensions, tzdata, urllib3, uv, uvicorn, yarl, zipp`
+* `sounddevice` (This records audio from the microphone.)
+* Full Dependency List (From `requirements.txt`): `aiohappyeyeballs, annotated-types, anyio, async-timeout, attrs, audioread, beautifulsoup4, certifi, cffi, charset-normalizer, click, contourpy, cycler, decorator, docopt, exceptiongroup, fastapi, filelock, fonttools, frozenlist, h11, idna, importlib_resources, Jinja2, joblib, Js2Py, kiwisolver, lazy_loader, librosa, llvmlite, MarkupSafe, matplotlib, mpmath, msgpack, multidict, networkx, numba, numpy, packaging, pandas, pillow, pipwin, platformdirs, pooch, propcache, psycopg2-binary, PyAudio, pycparser, pydantic, python-dateutil, python-dotenv, python-multipart, pytz, requests, scikit-learn, scipy, scikit-learn, seaborn, six, sniffio, sounddevice, soundfile, soupsieve, soxr, starlette, sympy, threadpoolctl, torch, typing_extensions, tzdata, urllib3, uv, uvicorn, yarl, zipp`
